@@ -165,5 +165,8 @@ fine_histo(TH2 *hFine_all, int index)
    root [3] TH1 *hFine_0 = fine_histo(hFine_all, 0);
    root [4] hFine_0->Draw();
    root [5] TF1 *ffermi = double_fermi_function()
-   root [6] hFine_all->Fit(ffermi);
+   root [6] hFine_0->Fit(ffermi);
+   root [7] TH1 *hFine_1 = fine_histo(hFine_all, 1);
+   root [8] hFine_1->Fit(ffermi);
+   ..etc fino a hFine_5...
  **/
