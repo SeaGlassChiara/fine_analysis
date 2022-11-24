@@ -19,7 +19,7 @@ fine_analysis
         for ( Int_t iFile = 0; iFile < 24; iFile++ ) {
             kInputFileNames.push_back(Form(/* /path/to/runspecific/file */"./decoded/alcdaq.fifo_%i.root",iFile));
         }
-        //! Generate fine tune for run1 (18min of 13/11)
+        //! Generate fine tune for run1
         kFineTuneHistograms[kCurrentRun] = uFineTuneAnalysis<TH2F>( kInputFileNames, "output.root" /* , /path/to/ouputfile */);
         cout << "first: " << kFineTuneHistograms[kCurrentRun]->GetName() << endl;
         uBuildNormalizedFineTune( kInputFileNames, kFineTuneHistograms[kCurrentRun], "output2.root" );
