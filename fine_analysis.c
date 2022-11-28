@@ -33,7 +33,8 @@ fine_analysis
  kInputFileNames.push_back(Form( /* /path/to/runspecific/file */ "./decoded/alcdaq.fifo_%i.root",iFile));
  }
  
- const auto database = uBuildNormalizedFineTune(kInputFileNames);
+ const auto tuning = uFineTuneAnalysis<TH2F>(kInputFileNames);
+ const auto database = uBuildNormalizedFineTune(kInputFileNames, tuning);
  
  
  TCanvas* c1 = new TCanvas();
@@ -55,4 +56,3 @@ fine_analysis
  h3->Draw("same");
  
  }
- 
