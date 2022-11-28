@@ -26,12 +26,11 @@ fine_analysis
     }
 }
 
-/*
  void test()
  {
  std::vector<TString> kInputFileNames;
  for ( Int_t iFile = 0; iFile < 24; iFile++ ) {
- kInputFileNames.push_back(Form( /path/to/runspecific/file "./decoded/alcdaq.fifo_%i.root",iFile));
+ kInputFileNames.push_back(Form( /* /path/to/runspecific/file */ "./decoded/alcdaq.fifo_%i.root",iFile));
  }
  
  const auto database = uBuildNormalizedFineTune(kInputFileNames);
@@ -39,21 +38,21 @@ fine_analysis
  
  TCanvas* c1 = new TCanvas();
  
- auto h0 = uGetFineTuneHisto<TH2F>(database, uGetIndex(0,0,0,0, false));
+ auto h0 = uGetFineTuneHisto<TH2F>(database, uGetIndex(1,0,0,0, false));
  h0->SetLineColor(kRed);
  h0->Draw();
  
- auto h1 = uGetFineTuneHisto<TH2F>(database, uGetIndex(1,0,0,0, false));
+ auto h1 = uGetFineTuneHisto<TH2F>(database, uGetIndex(1,0,0,1, false));
  h1->SetLineColor(kYellow);
  h1->Draw("same");
  
- auto h2 = uGetFineTuneHisto<TH2F>(database, uGetIndex(2,0,0,0, false));
+ auto h2 = uGetFineTuneHisto<TH2F>(database, uGetIndex(1,0,0,2, false));
  h2->SetLineColor(kGreen);
  h2->Draw("same");
  
- auto h3 = uGetFineTuneHisto<TH2F>(database, uGetIndex(3,0,0,0, false));
+ auto h3 = uGetFineTuneHisto<TH2F>(database, uGetIndex(1,0,0,3, false));
  h3->SetLineColor(kBlue);
  h3->Draw("same");
  
  }
- */
+ 
