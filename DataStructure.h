@@ -44,13 +44,21 @@ LoadTree
     kInputTree->SetBranchAddress(   "fine",     &kReadData.fine     );
 }
 //
-
 int
 uGetIndex
 ( int fifo, int pixel, int column, int tdc, bool kUseFIFO = true ) {
     //! 4 TDCs for each pixel
     //! 4 pixel for each column
     //! 8 columns for each chip
+    Bool_t kSkipCorrupted = false;
+    if ( fifo   < 0 ) kSkipCorrupted = true;
+    if ( pixel  < 0 ) kSkipCorrupted = true;
+    if ( column < 0 ) kSkipCorrupted = true;
+    if ( tdc    < 0 ) kSkipCorrupted = true;
+    if ( kSkipCorrupted ) {
+        std::cout << "[ERROR] Invalid negative value given, failed to determine global index!" << std::endl;
+        return -1;
+    }
     int chip = kUseFIFO ? fifo / 4 : fifo;
     int index = tdc + 4 * pixel + 16 * column + 128 * chip;
     return index;

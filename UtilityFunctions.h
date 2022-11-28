@@ -85,9 +85,7 @@ uFineTuneAnalysis
     //! Load Files
     auto hFine_All = uBuildFineTune<TH2F>( kInputFileNames );
     //! Create output
-    TFile*  kFileOut;
-    if ( !(kOutputFileName.Length() == 0) ) kFileOut = new TFile( kOutputFileName, "RECREATE" );
-    TH2F*       kFine_All_Tune_Params   = new TH2F( "kFine_All_Tune_Params", "kFine_All_Tune_Params", kIndexRange, -0.5, kIndexRange-0.5, 5, 0., 5.);
+    TH2_Type*   kFine_All_Tune_Params   = new TH2_Type( "kFine_All_Tune_Params", "kFine_All_Tune_Params", kIndexRange, -0.5, kIndexRange-0.5, 5, 0., 5.);
     TH1F*       kMaximumDistribution    = new TH1F( "kMaximumDistribution", "kMaximumDistribution", 200, 0, 200 );
     TH1F*       kMinimumDistribution    = new TH1F( "kMinimumDistribution", "kMinimumDistribution", 200, 0, 200 );
     kFine_All_Tune_Params->GetYaxis()->SetBinLabel(1,"Normalisation");
@@ -120,7 +118,8 @@ uFineTuneAnalysis
         }
     }
     //! Save output
-    if ( !(kOutputFileName.Length() == 0) ) {
+    if ( kOutputFileName.Length() != 0 ) {
+        TFile*  kFileOut = new TFile( kOutputFileName, "RECREATE" );
         kMaximumDistribution->Write();
         kMinimumDistribution->Write();
         hFine_All->Write();
@@ -138,14 +137,7 @@ TH2_Type*
 uBuildNormalizedFineTune
  ( std::vector<TString> kInputFileNames, TH2F* kFine_All_Tune_Params, TString kOutputFileName = "", TString kOutputGraphics = ""  ) {
     //! Create output
-    TH2_Type* hFine_All_Tuned = new TH2_Type("hFine_All_Tuned", "hFine_All_Tuned", kIndexRange, -0.5, kIndexRange-0.5, 300, -1., 200. );
-    //! Save output
-    if ( !(kOutputFileName.Length() == 0) ) {
-        TFile*  kFileOut = new TFile( kOutputFileName, "RECREATE" );
-        kFine_All_Tune_Params->Write();
-        hFine_All_Tuned->Write();
-        kFileOut->Close();
-    }
+    TH2_Type* hFine_All_Tuned = new TH2_Type("hFine_All_Tuned", "hFine_All_Tuned", kIndexRange, -0.5, kIndexRange-0.5, 200, -0.5, 1.5 );
     //! Loop on filenames
     for ( auto kCurrentFileName : kInputFileNames ) {
         std::cout << "[INFO] Opening file: " << kCurrentFileName.Data() << std::endl;
@@ -170,20 +162,25 @@ uBuildNormalizedFineTune
         for (int iEv = 0; iEv < nEvents; ++iEv) {
             kCurrentTree->GetEntry(iEv);
             int     iCurrentIndex   = uGetIndex( kCurrentData.fifo, kCurrentData.pixel, kCurrentData.column, kCurrentData.tdc );
-            float   kCurrentMaximum = kFine_All_Tune_Params->GetBinContent( iCurrentIndex, 1 );
-            float   kCurrentMinimum = kFine_All_Tune_Params->GetBinContent( iCurrentIndex, 3 );
+            if ( iCurrentIndex < 0 ) {
+                std::cout << "[WARNING] Invalid global index " << iCurrentIndex << " found! Skipping..." << std::endl;
+                continue;
+            }
+            float   kCurrentMaximum = kFine_All_Tune_Params->GetBinContent( iCurrentIndex, 2 );
+            float   kCurrentMinimum = kFine_All_Tune_Params->GetBinContent( iCurrentIndex, 4 );
             hFine_All_Tuned->Fill( iCurrentIndex, (kCurrentData.fine-kCurrentMinimum)/(kCurrentMaximum-kCurrentMinimum) );
-            break;
         }
         kCurrentFile->Close();
     }
-    //!
+    //! Save output
+    if ( !(kOutputFileName.Length() == 0) ) {
+        TFile*  kFileOut = new TFile( kOutputFileName, "RECREATE" );
+        kFine_All_Tune_Params->Write();
+        hFine_All_Tuned->Write();
+        kFileOut->Close();
+    }
     //! Run in Batch mode
     gROOT->SetBatch(false);
     return hFine_All_Tuned;
 }
-
-
-
-
 #endif

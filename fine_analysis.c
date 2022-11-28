@@ -21,7 +21,6 @@ fine_analysis
         }
         //! Generate fine tune for run1
         kFineTuneHistograms[kCurrentRun] = uFineTuneAnalysis<TH2F>( kInputFileNames, "output.root" /* , /path/to/ouputfile */);
-        cout << "first: " << kFineTuneHistograms[kCurrentRun]->GetName() << endl;
         uBuildNormalizedFineTune( kInputFileNames, kFineTuneHistograms[kCurrentRun], "output2.root" );
     }
 }
@@ -33,8 +32,8 @@ fine_analysis
  kInputFileNames.push_back(Form( /* /path/to/runspecific/file */ "./decoded/alcdaq.fifo_%i.root",iFile));
  }
  
- const auto tuning = uFineTuneAnalysis<TH2F>(kInputFileNames);
- const auto database = uBuildNormalizedFineTune(kInputFileNames, tuning);
+ const auto tuning      = uFineTuneAnalysis<TH2F>(kInputFileNames, "uTuneALCORout.root");
+ const auto database    = uBuildNormalizedFineTune(kInputFileNames, tuning, "TunedALCORout.root" );
  
  
  TCanvas* c1 = new TCanvas();
