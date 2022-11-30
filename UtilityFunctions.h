@@ -38,7 +38,7 @@ TH2_Type*
 uBuildFineTune
  ( std::vector<TString> kInputFileNames ) {
     //! histogram with fine distribution
-    TH2_Type* hFine_All = new TH2_Type("hFine_All", ";index;fine", 768, 0, 768, 512, 0, 512);
+    TH2_Type* hFine_All = new TH2_Type("hFine_All", ";index;fine", 768, 0, 768, 512, 0, 512); //! TODO: change to centralized index
     //
     //! Loop on filenames
     for ( auto kCurrentFileName : kInputFileNames ) {
@@ -111,9 +111,27 @@ uFineTuneAnalysis
         kMaximumDistribution->Fill(uDoubleFermi->GetParameter(1));
         kMinimumDistribution->Fill(uDoubleFermi->GetParameter(3));
         if ( !(kOutputGraphics.Length() == 0) ) {
-            TCanvas* c1 = new TCanvas();
-            kCurrentFineHisto->Draw();
-            uDoubleFermi->Draw("SAME");
+            TLatex* kLatex = new TLatex();
+            auto kMinimum = uDoubleFermi->GetParameter(3);
+            auto kMaximum = uDoubleFermi->GetParameter(1);
+            TCanvas* c1 = new TCanvas("", "", 1000, 300);
+            c1->Divide(3,1);
+            c1->cd(1);
+            kCurrentFineHisto->GetXaxis()->SetRangeUser(kMinimum -10, kMinimum +20);
+            kCurrentFineHisto->DrawCopy();
+            kLatex->DrawLatexNDC(0.6, 0.5, Form("Min: %.2f", kMinimum));
+            c1->cd(2);
+            kCurrentFineHisto->GetXaxis()->SetRangeUser(kMinimum -10, kMaximum +10);
+            kCurrentFineHisto->DrawCopy();
+            kLatex->DrawLatexNDC(0.4, 0.5, Form("Max: %.2f", kMaximum));
+            kLatex->DrawLatexNDC(0.4, 0.45, Form("Min: %.2f", kMinimum));
+            c1->cd(3);
+            kCurrentFineHisto->GetXaxis()->SetRangeUser(kMaximum -20, kMaximum +10);
+            kCurrentFineHisto->DrawCopy();
+            kLatex->DrawLatexNDC(0.3, 0.5, Form("Max: %.2f", kMaximum));
+            
+            
+            //uDoubleFermi->Draw("SAME");
             c1->SaveAs(Form("%s/%s.pdf",kOutputGraphics.Data(),kCurrentFineHisto->GetName()));
         }
     }
@@ -137,7 +155,7 @@ TH2_Type*
 uBuildNormalizedFineTune
  ( std::vector<TString> kInputFileNames, TH2F* kFine_All_Tune_Params, TString kOutputFileName = "", TString kOutputGraphics = ""  ) {
     //! Create output
-    TH2_Type* hFine_All_Tuned = new TH2_Type("hFine_All_Tuned", "hFine_All_Tuned", kIndexRange, -0.5, kIndexRange-0.5, 200, -0.5, 1.5 );
+    TH2_Type* hFine_All_Tuned = new TH2_Type("hFine_All_Tuned", "hFine_All_Tuned", kIndexRange, -0.5, kIndexRange-0.5, 120, -20, 100 );
     //! Loop on filenames
     for ( auto kCurrentFileName : kInputFileNames ) {
         std::cout << "[INFO] Opening file: " << kCurrentFileName.Data() << std::endl;
@@ -166,9 +184,9 @@ uBuildNormalizedFineTune
                 std::cout << "[WARNING] Invalid global index " << iCurrentIndex << " found! Skipping..." << std::endl;
                 continue;
             }
-            float   kCurrentMaximum = kFine_All_Tune_Params->GetBinContent( iCurrentIndex, 2 );
-            float   kCurrentMinimum = kFine_All_Tune_Params->GetBinContent( iCurrentIndex, 4 );
-            hFine_All_Tuned->Fill( iCurrentIndex, (kCurrentData.fine-kCurrentMinimum)/(kCurrentMaximum-kCurrentMinimum) );
+            float   kCurrentMaximum = kFine_All_Tune_Params->GetBinContent( iCurrentIndex+1, 2 );
+            float   kCurrentMinimum = kFine_All_Tune_Params->GetBinContent( iCurrentIndex+1, 4 );
+            hFine_All_Tuned->Fill( iCurrentIndex, (kCurrentData.fine-kCurrentMinimum) );
         }
         kCurrentFile->Close();
     }
