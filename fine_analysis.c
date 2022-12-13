@@ -9,7 +9,8 @@
 //
 #include "UtilityFunctions.h"
 //#include "DataStructure.h"
-//
+
+//for run1
 void
 fine_analysis
  ( std::vector<TString> kRunList ) {
@@ -23,10 +24,12 @@ fine_analysis
         //! Generate fine tune for run1
         kFineTuneHistograms[kCurrentRun] = uFineTuneAnalysis<TH2F>( kInputFileNames, "output.root", "./graphics");
         uBuildNormalizedFineTune( kInputFileNames, kFineTuneHistograms[kCurrentRun], "output2.root" );
+        
     }
 }
 
- void test()
+ void 
+ draw()
  {
  std::vector<TString> kInputFileNames;
  for ( Int_t iFile = 0; iFile < 24; iFile++ ) {
@@ -39,20 +42,23 @@ fine_analysis
  
  TCanvas* c1 = new TCanvas();
  
- auto h0 = uGetFineTuneHisto<TH2F>(database, uGetIndex(0,0,0,0, false));
+ auto h0 = uGetFineTuneHisto<TH2F>(database, uGetIndex(0,1,1,0, false));
  h0->SetLineColor(kRed);
  h0->Draw();
  
- auto h1 = uGetFineTuneHisto<TH2F>(database, uGetIndex(0,0,0,1, false));
- h1->SetLineColor(kYellow);
+ auto h1 = uGetFineTuneHisto<TH2F>(database, uGetIndex(0,1,1,1, false));
+ h1->SetLineColor(kOrange);
  h1->Draw("same");
  
- auto h2 = uGetFineTuneHisto<TH2F>(database, uGetIndex(0,0,0,2, false));
+ auto h2 = uGetFineTuneHisto<TH2F>(database, uGetIndex(0,1,1,2, false));
  h2->SetLineColor(kGreen);
  h2->Draw("same");
  
- auto h3 = uGetFineTuneHisto<TH2F>(database, uGetIndex(0,0,0,3, false));
+ auto h3 = uGetFineTuneHisto<TH2F>(database, uGetIndex(0,1,1,3, false));
  h3->SetLineColor(kBlue);
  h3->Draw("same");
  
  }
+ 
+ 
+ 

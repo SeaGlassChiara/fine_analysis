@@ -11,7 +11,43 @@
 //
 #include "DataStructure.h"
 //
-//  Utility TF1 Functions
+
+//Consiglio di Roberto
+
+/** this function retrieves the fine calibration 
+    and returns the value of the clock phase
+    according to the formula of Fabio Cossio
+    
+    IF = ( MAX - MIN)
+    CUT = 0.5 * (MAX + MIN)
+    phase = (fine - MIN) / IF
+    if ( fine > CUT )
+     phase -= 1
+**/
+
+/*
+double 
+getCalibratedPhase
+( int fine, int chip, int pixel, int column, int tdc ) {
+	double MIN = getFineCalibrationMIN( chip, pixel, column, tdc );
+	double MAX = getFineCalibrationMAX( chip, pixel, column, tdc );
+	double CUT = 0.5 * ( MIN + MAX);
+	double IF = ( MAX - MIN );
+	double phase = ( fine - MIN ) / IF;
+	if ( fine > CUT ) phase -= 1.;
+	return phase;
+}
+//  --- --- ---
+
+*/
+
+//TODO: Distribution Max(run1)-Max(run2)
+
+
+//TODO: Distribution Min(run1)-Min(run2)
+
+
+//  TF1 Fit Function
 auto uDoubleFermi = new TF1("DoubleFermi", "[0]*(1./(exp((x-[1])/[2])+1))*(1./(exp(([3]-x)/[4])+1))", 20., 150.);
 void
 uSetDoubleFermi
@@ -33,12 +69,14 @@ uSetDoubleFermi
     uDoubleFermi->SetParameter(4, 0.4);
 }
 //  --- --- ---
+
+//Histo All Fine Data
 template< typename TH2_Type = TH2F >
 TH2_Type*
 uBuildFineTune
  ( std::vector<TString> kInputFileNames ) {
     //! histogram with fine distribution
-    TH2_Type* hFine_All = new TH2_Type("hFine_All", ";index;fine", 768, 0, 768, 512, 0, 512); //! TODO: change to centralized index
+    TH2_Type* hFine_All = new TH2_Type("hFine_All", ";index;fine", 768, 0, 768, 512, 0, 512); //! TODO: change to centralised index
     //
     //! Loop on filenames
     for ( auto kCurrentFileName : kInputFileNames ) {
@@ -129,6 +167,7 @@ uFineTuneAnalysis
             kCurrentFineHisto->GetXaxis()->SetRangeUser(kMaximum -20, kMaximum +10);
             kCurrentFineHisto->DrawCopy();
             kLatex->DrawLatexNDC(0.3, 0.5, Form("Max: %.2f", kMaximum));
+         
             
             
             //uDoubleFermi->Draw("SAME");
@@ -149,13 +188,13 @@ uFineTuneAnalysis
     return kFine_All_Tune_Params;
 }
 //  --- --- ---
-//
+//Calibration + Normalisation
 template< typename TH2_Type = TH2F >
 TH2_Type*
 uBuildNormalizedFineTune
  ( std::vector<TString> kInputFileNames, TH2F* kFine_All_Tune_Params, TString kOutputFileName = "", TString kOutputGraphics = ""  ) {
     //! Create output
-    TH2_Type* hFine_All_Tuned = new TH2_Type("hFine_All_Tuned", "hFine_All_Tuned", kIndexRange, -0.5, kIndexRange-0.5, 120, -20, 100 );
+    TH2_Type* hFine_All_Tuned = new TH2_Type("hFine_All_Tuned", "hFine_All_Tuned", kIndexRange, -0.5, kIndexRange-0.5, 120, -1, 2 );
     //! Loop on filenames
     for ( auto kCurrentFileName : kInputFileNames ) {
         std::cout << "[INFO] Opening file: " << kCurrentFileName.Data() << std::endl;
@@ -186,7 +225,7 @@ uBuildNormalizedFineTune
             }
             float   kCurrentMaximum = kFine_All_Tune_Params->GetBinContent( iCurrentIndex+1, 2 );
             float   kCurrentMinimum = kFine_All_Tune_Params->GetBinContent( iCurrentIndex+1, 4 );
-            hFine_All_Tuned->Fill( iCurrentIndex, (kCurrentData.fine-kCurrentMinimum) );
+            hFine_All_Tuned->Fill( iCurrentIndex, (kCurrentData.fine-kCurrentMinimum)/(kCurrentMaximum-kCurrentMinimum) );
         }
         kCurrentFile->Close();
     }
