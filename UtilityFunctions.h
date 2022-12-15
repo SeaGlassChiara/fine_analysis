@@ -12,8 +12,6 @@
 #include "DataStructure.h"
 //
 
-//Consiglio di Roberto
-
 /** this function retrieves the fine calibration 
     and returns the value of the clock phase
     according to the formula of Fabio Cossio
