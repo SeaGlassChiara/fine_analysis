@@ -25,12 +25,11 @@
      phase -= 1
 **/
 
-/*
+
 double 
 getCalibratedPhase
-( int fine, int chip, int pixel, int column, int tdc ) {
-	double MIN = getFineCalibrationMIN( chip, pixel, column, tdc );
-	double MAX = getFineCalibrationMAX( chip, pixel, column, tdc );
+( int fine, float MIN, float MAX ) {
+	
 	double CUT = 0.5 * ( MIN + MAX);
 	double IF = ( MAX - MIN );
 	double phase = ( fine - MIN ) / IF;
@@ -39,7 +38,7 @@ getCalibratedPhase
 }
 //  --- --- ---
 
-*/
+
 
 //TODO: Distribution Max(run1)-Max(run2)
 
@@ -194,11 +193,11 @@ TH2_Type*
 uBuildNormalizedFineTune
  ( std::vector<TString> kInputFileNames, TH2F* kFine_All_Tune_Params, TString kOutputFileName = "", TString kOutputGraphics = ""  ) {
     //! Create output
-    TH2_Type* hFine_All_Tuned = new TH2_Type("hFine_All_Tuned", "hFine_All_Tuned", kIndexRange, -0.5, kIndexRange-0.5, 120, -1, 2 );
+    TH2_Type* hFine_All_Tuned = new TH2_Type("hFine_All_Tuned", "hFine_All_Tuned", kIndexRange, -0.5, kIndexRange-0.5, 189, -1, 2 );
     //! Loop on filenames
     for ( auto kCurrentFileName : kInputFileNames ) {
         std::cout << "[INFO] Opening file: " << kCurrentFileName.Data() << std::endl;
-        //! Load File
+        //! Load FileF
         auto kCurrentFile = TFile::Open(kCurrentFileName);
         if ( !kCurrentFile || !kCurrentFile->IsOpen() ) {
             std::cout << "[WARNING] Opening file: " << kCurrentFileName.Data() << " failed!" << std::endl;
@@ -225,7 +224,8 @@ uBuildNormalizedFineTune
             }
             float   kCurrentMaximum = kFine_All_Tune_Params->GetBinContent( iCurrentIndex+1, 2 );
             float   kCurrentMinimum = kFine_All_Tune_Params->GetBinContent( iCurrentIndex+1, 4 );
-            hFine_All_Tuned->Fill( iCurrentIndex, (kCurrentData.fine-kCurrentMinimum)/(kCurrentMaximum-kCurrentMinimum) );
+            
+            hFine_All_Tuned->Fill( iCurrentIndex, getCalibratedPhase(kCurrentData.fine, kCurrentMinimum, kCurrentMaximum) );
         }
         kCurrentFile->Close();
     }
